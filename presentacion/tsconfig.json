@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+      "target": "esnext",  // Usa la versión más moderna de JavaScript
+      "module": "esnext",  // Usa módulos ES
+      "moduleResolution": "node",  // Resolución de módulos al estilo de Node.js
+      "esModuleInterop": true,  // Permite importar módulos comunes
+      "strict": true,  // Habilita comprobaciones estrictas (recomendado)
+      "skipLibCheck": true,  // Ignora las comprobaciones de tipos en bibliotecas de terceros
+      "forceConsistentCasingInFileNames": true,  // Asegura que los nombres de los archivos se respeten con mayúsculas y minúsculas
+      "resolveJsonModule": true,  // Permite importar archivos JSON
+      "allowJs": true,  // Permite archivos JavaScript junto con TypeScript
+      "jsx": "preserve"  // Mantén el JSX intacto (necesario si usas Svelte con JSX)
+    },
+    "include": [
+      "src/**/*",  // Incluye todos los archivos dentro de la carpeta src
+      "node_modules/svelte/types"  // Asegúrate de que Svelte se incluya en las comprobaciones de tipo
+    ],
+    "exclude": [
+      "node_modules"  // Excluye node_modules para mejorar el rendimiento
+    ]
+  }
+  

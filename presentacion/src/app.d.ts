@@ -1,13 +1,14 @@
-// See https://svelte.dev/docs/kit/types#app.d.ts
-// for information about these interfaces
+// Extiende los tipos globales de SvelteKit
 declare global {
 	namespace App {
-		// interface Error {}
-		// interface Locals {}
-		// interface PageData {}
-		// interface PageState {}
-		// interface Platform {}
+		// Puedes extender estas interfaces si lo necesitas más tarde
+	}
+
+	// Declara que el objeto `ethereum` existe en `window`
+	interface Window {
+		ethereum: any;
 	}
 }
 
+// Esto asegura que sea un módulo y evite conflictos
 export {};

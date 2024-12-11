@@ -1,52 +1,45 @@
 const express = require('express');
-const mongoose = require('mongoose');
+const { ethers } = require('ethers');
 const bodyParser = require('body-parser');
-const cors = require('cors');
+const contractABI = require('./path/to/TransactionContract.json'); // Ruta al ABI del contrato
 
-// Conexión a MongoDB
-mongoose.connect('mongodb://localhost:27017/blockchainDB', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-// Definición del esquema de transacciones
-const transactionSchema = new mongoose.Schema({
-  sender: String,
-  receiver: String,
-  amount: Number,
-  timestamp: Date,
-  blockHash: String,
-});
-
-const Transaction = mongoose.model('Transaction', transactionSchema);
-
-// Configuración del servidor
 const app = express();
-app.use(cors());
+const port = 3000;
+
 app.use(bodyParser.json());
 
-// Endpoint para obtener transacciones
-app.get('/transactions', async (req, res) => {
-  const transactions = await Transaction.find();
-  res.json(transactions);
+// Configura el proveedor de Ethereum (usando Infura, Alchemy o Ganache)
+const provider = new ethers.JsonRpcProvider('http://localhost:8545'); // Cambia la URL si usas una red diferente
+const wallet = new ethers.Wallet('YOUR_PRIVATE_KEY', provider); // Asegúrate de tener la clave privada correcta
+const contractAddress = 'CONTRACT_ADDRESS'; // Dirección del contrato
+
+// Crea una instancia del contrato
+const contract = new ethers.Contract(contractAddress, contractABI.abi, wallet);
+
+// Endpoint para crear una transacción en la blockchain
+app.post('/create-transaction', async (req, res) => {
+  const { receiver, amount } = req.body;
+
+  try {
+    // Llama a la función del contrato para crear la transacción
+    const tx = await contract.createTransaction(receiver, amount);
+    console.log('Transacción enviada:', tx);
+
+    // Esperar la confirmación de la transacción
+    const receipt = await tx.wait();
+
+    // Enviar la respuesta con el recibo de la transacción
+    res.status(200).json({
+      message: 'Transacción exitosa',
+      transactionHash: receipt.transactionHash,
+      blockHash: receipt.blockHash
+    });
+  } catch (error) {
+    console.error('Error al crear transacción:', error);
+    res.status(500).json({ error: 'Error al crear la transacción' });
+  }
 });
 
-// Endpoint para agregar una transacción
-app.post('/transactions', async (req, res) => {
-  const { sender, receiver, amount, blockHash } = req.body;
-  const transaction = new Transaction({
-    sender,
-    receiver,
-    amount,
-    timestamp: new Date(),
-    blockHash,
-  });
-  await transaction.save();
-  res.json({ message: 'Transaction saved!', transaction });
-});
-
-// Iniciar el servidor
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`Backend escuchando en http://localhost:${port}`);
 });
